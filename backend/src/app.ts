@@ -43,19 +43,10 @@ app.use("/api/auth", authRoutes);
 app.use("/api/projects", projectRoutes);
 app.use("/api/dashboard", dashboardRoutes);
 
-// Serve Frontend in Production
-if (process.env.NODE_ENV === "production") {
-  const frontendPath = path.join(__dirname, "../../frontend/dist");
-  app.use(express.static(frontendPath));
-
-  app.use((req, res) => {
-    res.sendFile(path.join(frontendPath, "index.html"));
-  });
-} else {
-  app.get("/", (req, res) => {
-    res.send("Team Task Manager API is running...");
-  });
-}
+// Always return API status on root
+app.get("/", (req, res) => {
+  res.send("Team Task Manager API is running...");
+});
 
 // Global Error Handler
 app.use(errorHandler);
