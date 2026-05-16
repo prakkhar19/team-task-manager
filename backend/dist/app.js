@@ -41,7 +41,7 @@ app.use("/api/dashboard", dashboardRoutes_1.default);
 if (process.env.NODE_ENV === "production") {
     const frontendPath = path_1.default.join(__dirname, "../../frontend/dist");
     app.use(express_1.default.static(frontendPath));
-    app.get("*", (req, res) => {
+    app.use((req, res) => {
         res.sendFile(path_1.default.join(frontendPath, "index.html"));
     });
 }
