@@ -1,0 +1,65 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(uuid())
+  name      String
+  email     String   @unique
+  password  String
+  createdAt DateTime @default(now())
+
+  projectMembers ProjectMember[]
+  tasksAssigned  Task[]          @relation("AssignedTasks")
+  tasksCreated   Task[]          @relation("CreatedTasks")
+  projectsCreated Project[]      @relation("ProjectCreator")
+}
+
+model Project {
+  id          String   @id @default(uuid())
+  title       String
+  description String?
+  createdBy   String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  creator     User            @relation("ProjectCreator", fields: [createdBy], references: [id])
+  members     ProjectMember[]
+  tasks       Task[]
+}
+
+model ProjectMember {
+  id        String   @id @default(uuid())
+  projectId String
+  userId    String
+  role      String   // "Admin" | "Member"
+  joinedAt  DateTime @default(now())
+
+  project   Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([projectId, userId])
+}
+
+model Task {
+  id          String   @id @default(uuid())
+  projectId   String
+  title       String
+  description String?
+  status      String   @default("To Do") // "To Do" | "In Progress" | "Done"
+  priority    String   @default("Medium") // "Low" | "Medium" | "High"
+  dueDate     DateTime?
+  createdBy   String
+  assignedTo  String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  project     Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  creator     User     @relation("CreatedTasks", fields: [createdBy], references: [id])
+  assignee    User?    @relation("AssignedTasks", fields: [assignedTo], references: [id], onDelete: SetNull)
+}
