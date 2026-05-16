@@ -1,0 +1,8 @@
+[build]
+builder = "NIXPACKS"
+buildCommand = "npm run build"
+
+[deploy]
+startCommand = "npx prisma migrate deploy --schema=./backend/prisma/schema.prisma && npm start"
+healthcheckPath = "/api/health"
+healthcheckTimeout = 100
